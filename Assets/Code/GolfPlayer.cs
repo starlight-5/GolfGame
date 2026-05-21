@@ -12,6 +12,7 @@ public class GolfPlayer : MonoBehaviour
     public float angle = 30f;
     public int simulationSteps = 50; // 예측선 길이
     public float stepTime = 0.05f;   // 시뮬레이션 간격
+    public bool hit = false;
 
     void Start()
     {
@@ -35,14 +36,16 @@ public class GolfPlayer : MonoBehaviour
             DrawTrajectory();
 
             // 스페이스바로 타격
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                Vector3 shootDirection = transform.forward * Mathf.Cos(angle * Mathf.Deg2Rad) + transform.up * Mathf.Sin(angle * Mathf.Deg2Rad);
-                golfBall.HitBall(shootDirection * power);
-                
-                lineRenderer.positionCount = 0; // 발사 후 궤적 숨김
-                cameraTracker.isTracking = true; // 트래킹 카메라로 전환
-            }
+                if (hit)
+                {
+                    Vector3 shootDirection = transform.forward * Mathf.Cos(angle * Mathf.Deg2Rad) + transform.up * Mathf.Sin(angle * Mathf.Deg2Rad);
+                    golfBall.HitBall(shootDirection * power);
+
+                    lineRenderer.positionCount = 0; // 발사 후 궤적 숨김
+                    cameraTracker.isTracking = true; // 트래킹 카메라로 전환
+                    hit = false; // 타격 신호 초기화
+                }
+            
         }
     }
 
@@ -50,7 +53,7 @@ public class GolfPlayer : MonoBehaviour
     {
         Vector3 simulatedPosition = golfBall.transform.position;
         Vector3 shootDirection = transform.forward * Mathf.Cos(angle * Mathf.Deg2Rad) + transform.up * Mathf.Sin(angle * Mathf.Deg2Rad);
-        
+
         // 질량을 고려한 초기 속도 예측
         Vector3 simulatedVelocity = (shootDirection * power) / golfBall.GetComponent<Rigidbody>().mass;
 

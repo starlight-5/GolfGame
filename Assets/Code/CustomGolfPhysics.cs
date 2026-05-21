@@ -93,6 +93,62 @@ public class CustomGolfPhysics : MonoBehaviour
         }
     }
 
+    private void OnCollisionStay(Collision collision)
+    {
+        // 충돌한 대상이 Terrain일 경우
+        if (collision.gameObject.GetComponent<Terrain>() != null)
+        {
+            // 공의 현재 위치를 기반으로 텍스처 인덱스를 가져옴
+            int textureIndex = GetMainTerrainTexture(transform.position, collision.gameObject.GetComponent<Terrain>());
+
+            // 텍스처 인덱스에 따라 물리 계수 변경 (Layer 순서에 맞게 설정)
+            if(textureIndex == 3) { // 그린 (4번째 텍스처)
+                currentFriction = 1f;
+                currentRestitution = 0f;
+            }
+            else if (textureIndex == 2) { // 벙커 (3번째 텍스처)
+                currentFriction = 0.8f;
+                currentRestitution = 0.2f;
+            } else if (textureIndex == 1) { // 러프 (2번째 텍스처)
+                currentFriction = 0.6f;
+                currentRestitution = 0.4f;
+            } else { // 페어웨이 (1번째 텍스처 - 기본값)
+                currentFriction = 0.3f;
+                currentRestitution = 0.6f;
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // [핵심 기술] 현재 위치의 Terrain 텍스처 인덱스를 반환하는 함수
+    // ---------------------------------------------------------
+    private int GetMainTerrainTexture(Vector3 worldPos, Terrain terrain)
+    {
+        TerrainData terrainData = terrain.terrainData;
+        Vector3 terrainPos = terrain.transform.position;
+
+        // 1. 월드 좌표를 Terrain 알파맵(Splatmap) 좌표로 변환
+        int mapX = (int)(((worldPos.x - terrainPos.x) / terrainData.size.x) * terrainData.alphamapWidth);
+        int mapZ = (int)(((worldPos.z - terrainPos.z) / terrainData.size.z) * terrainData.alphamapHeight);
+
+        // 2. 해당 좌표의 텍스처 혼합 비율(알파값) 배열을 가져옴
+        float[,,] splatmapData = terrainData.GetAlphamaps(mapX, mapZ, 1, 1);
+
+        // 3. 가장 비율이 높은(가장 진하게 칠해진) 텍스처의 인덱스를 찾음
+        int maxIndex = 0;
+        float maxAlpha = 0f;
+
+        for (int i = 0; i < splatmapData.GetLength(2); i++)
+        {
+            if (splatmapData[0, 0, i] > maxAlpha)
+            {
+                maxAlpha = splatmapData[0, 0, i];
+                maxIndex = i;
+            }
+        }
+
+        return maxIndex;
+    }
     private void OnCollisionExit(Collision collision)
     {
         isInAir = true;
