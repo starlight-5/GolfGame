@@ -1,58 +1,94 @@
 using UnityEngine;
-using UnityEngine.UI; // UI 컴포넌트(Image 등)를 제어하기 위해 필수입니다!
+using UnityEngine.UI; 
 
 public class UiController : MonoBehaviour
 {
     [Header("References")]
     public GolfPlayer golfPlayer;
-    public Image powerBarImage; // 방금 설정한 게이지 바 UI 이미지를 연결할 곳
+    public Image powerBarImage; 
+    public Image yellowGage;
 
     [Header("Settings")]
     public float powerMax = 15f;
-    public float chargeSpeed = 2f; // 게이지가 오르내리는 속도
-
-    private float currentPower = 0f; // 0.0 ~ 1.0 사이의 비율 값
-    private int direction = 1;       // 1이면 상승, -1이면 하락
     
+    // chargeSpeed 대신 '몇 초마다 한 칸씩 움직일지' 결정하는 변수로 바꿨습니다.
+    [Tooltip("몇 초마다 게이지가 한 칸(0.125)씩 움직일지 설정 (예: 0.1초)")]
+    public float stepDelay = 0.1f; 
+
+    private float currentPower = 0f; 
+    private int direction = 1;       
+    
+    // ★ 타이머 역할을 할 변수 추가
+    private float timer = 0f;
+
     private bool isCharging = false;
     private bool isPowerLocked = false;
+    public bool isChangeYellowGage = false;
 
     void Update()
     {
+        YellowGageRange();
         HandleInput();
         UpdateChargingUI();
     }
 
+    private void YellowGageRange()
+    {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            if (yellowGage.fillAmount < 1f)
+            {
+                yellowGage.fillAmount += 0.125f;
+                Debug.Log("예측게이지 증가");
+            }
+            else
+            {
+                yellowGage.fillAmount = 1f;
+            }
+            isChangeYellowGage = true;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            if (yellowGage.fillAmount > 0f)
+            {
+                yellowGage.fillAmount -= 0.125f;
+                Debug.Log("예측게이지 감소");
+            }
+            else
+            {
+                yellowGage.fillAmount = 0f;
+            }
+            isChangeYellowGage = true;
+        }
+    }
+
     private void HandleInput()
     {
-        // 스페이스바 입력 처리
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (!isCharging && !isPowerLocked)
             {
-                // [첫 번째 스페이스바] 차징 시작
                 isCharging = true;
                 currentPower = 0f;
                 direction = 1;
+                timer = 0f; // ★ 차징 시작 시 타이머도 0으로 초기화
                 Debug.Log("차징 시작!");
             }
             else if (isCharging)
             {
-                // [두 번째 스페이스바] 차징 확정
                 isCharging = false;
                 isPowerLocked = true;
 
-                // GolfPlayer에게 최종 계산된 힘(현재 비율 * 최대 파워)을 전달합니다.
                 if (golfPlayer != null)
                 {
                     golfPlayer.power = currentPower * powerMax;
                     Debug.Log($"파워 확정! 골프 플레이어에게 전달된 힘: {golfPlayer.power}");
-                    golfPlayer.hit = true; // 골프 플레이어에게 타격 신호 전달
+                    golfPlayer.hit = true; 
                 }
             }
             else if (isPowerLocked)
             {
-                // (선택 사항) 세 번째 누르거나, 공을 친 후 게이지 초기화
                 isPowerLocked = false;
                 currentPower = 0f;
                 powerBarImage.fillAmount = 0f;
@@ -63,28 +99,35 @@ public class UiController : MonoBehaviour
 
     private void UpdateChargingUI()
     {
-        // 차징 중일 때만 게이지 바 수치를 변경합니다.
         if (isCharging)
         {
-            // 시간에 따라 currentPower 증가 또는 감소
-            currentPower += direction * chargeSpeed * Time.deltaTime;
+            // ★ 매 프레임마다 시간을 누적합니다.
+            timer += Time.deltaTime;
 
-            // 핑퐁(PingPong) 로직: 100%(1.0)에 도달하면 깎이고, 0%(0.0)에 도달하면 다시 오름
-            if (currentPower >= 1f)
+            // ★ 누적된 시간이 우리가 설정한 딜레이(stepDelay)를 넘었을 때만 게이지를 0.125 올립니다.
+            if (timer >= stepDelay)
             {
-                currentPower = 1f;
-                direction = -1; // 하락 방향으로 전환
-            }
-            else if (currentPower <= 0f)
-            {
-                currentPower = 0f;
-                direction = 1;  // 상승 방향으로 전환
-            }
+                // 다음 칸을 위해 타이머를 다시 0으로 돌려놓습니다.
+                timer = 0f; 
 
-            // 계산된 0.0 ~ 1.0 사이의 값을 UI 이미지의 Fill Amount에 바로 적용
-            if (powerBarImage != null)
-            {
-                powerBarImage.fillAmount = currentPower;
+                // 게이지 한 칸(0.125) 이동!
+                currentPower += direction * 0.125f;
+
+                if (currentPower >= 1f)
+                {
+                    currentPower = 1f;
+                    direction = -1; 
+                }
+                else if (currentPower <= 0f)
+                {
+                    currentPower = 0f;
+                    direction = 1;  
+                }
+
+                if (powerBarImage != null)
+                {
+                    powerBarImage.fillAmount = currentPower;
+                }
             }
         }
     }

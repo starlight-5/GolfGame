@@ -6,6 +6,7 @@ public class GolfPlayer : MonoBehaviour
     public CustomGolfPhysics golfBall;
     public CameraTracker cameraTracker;
     private LineRenderer lineRenderer;
+    public UiController Ui;
 
     [Header("Shoot Settings")]
     public float power = 15f;
@@ -26,8 +27,12 @@ public class GolfPlayer : MonoBehaviour
             cameraTracker.isTracking = false; // 조준 모드
 
             // 파워 및 조준 회전
-            if (Input.GetKey(KeyCode.W)) power += 10f * Time.deltaTime;
-            if (Input.GetKey(KeyCode.S)) power -= 10f * Time.deltaTime;
+            if (Ui.isChangeYellowGage)
+            {
+                power = Ui.yellowGage.fillAmount * Ui.powerMax;
+                Ui.isChangeYellowGage = false;
+            }
+            
             transform.Rotate(0, Input.GetAxis("Horizontal") * 50f * Time.deltaTime, 0);
 
             power = Mathf.Clamp(power, 0f, 50f);
