@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // ★ TextMeshPro를 사용하기 위해 반드시 추가해야 합니다!
 
 public class UiController : MonoBehaviour
 {
     [Header("References")]
     public GolfBallController golfPlayer; 
-    public Image powerBarImage; 
+    public Image powerBarImage;
+    public TextMeshProUGUI hitCountText;
 
     void Update()
     {
@@ -20,7 +22,8 @@ public class UiController : MonoBehaviour
 
         // UI에 적용
         powerBarImage.fillAmount = powerRatio;
-
+        // hit text
+        hitCountText.text = $"Stroke :{golfPlayer.ballHitCount}";
         // ★ [테스트용 로그] 이 메시지가 콘솔 창에 다다다닥 떠야 정상입니다.
         if (powerRatio > 0)
         {

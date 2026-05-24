@@ -23,6 +23,7 @@ public class GolfBallController : MonoBehaviour
 
     private bool isCharging = false;
     private bool isPowerIncreasing = true;
+    public int ballHitCount = 0;
 
     void Start()
     {
@@ -81,7 +82,8 @@ public class GolfBallController : MonoBehaviour
                     golfBall.HitBall(shootDirection * power);
                     
                     lineRenderer.positionCount = 0; 
-                    cameraTracker.isTracking = true; 
+                    cameraTracker.isTracking = true;
+                    ballHitCount++;//볼 치는 횟수 카운트 나중에 게임 끝나면 초기화 시켜야함.
                     return; 
                 }
             }
