@@ -849,7 +849,7 @@ GameObject:
   - component: {fileID: 376476265}
   - component: {fileID: 376476264}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: HitCountText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2017,6 +2017,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UiController
   golfPlayer: {fileID: 1500402121}
   powerBarImage: {fileID: 775945855}
+  hitCountText: {fileID: 376476264}
 --- !u!1 &984908571
 GameObject:
   m_ObjectHideFlags: 0
@@ -2932,6 +2933,7 @@ MonoBehaviour:
   clubAngle: 12
   simulationSteps: 50
   stepTime: 0.05
+  ballHitCount: 0
 --- !u!120 &1500402122
 LineRenderer:
   serializedVersion: 3
