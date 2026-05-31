@@ -9,6 +9,7 @@ TagManager:
   - ground
   - Bunker
   - Rough
+  - Goal
   layers:
   - Default
   - TransparentFX
