@@ -36,6 +36,7 @@ public class WindUIController : MonoBehaviour
 
         if (windSpeedText != null)
         {
+            //"F1"은 숫자를 소수점 첫째 자리까지 표시
             windSpeedText.text = speed.ToString("F1") + "m";
         }
     }

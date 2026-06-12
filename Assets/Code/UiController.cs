@@ -6,17 +6,26 @@ public class UiController : MonoBehaviour
 {
     [Header("References")]
     public GolfBallController golfPlayer; 
+    public CustomGolfPhysics golfPhysics;
     public Image powerBarImage;
     public TextMeshProUGUI hitCountText;
-
+    public TextMeshProUGUI cofficientText;
     void Update()
     {
-        if (golfPlayer == null || powerBarImage == null) 
+        if (golfPlayer == null || powerBarImage == null || golfPhysics == null ) 
         {
-            Debug.LogWarning("UI 컨트롤러에 골프공이나 이미지가 연결되지 않았습니다!");
+            Debug.LogWarning("UI 컨트롤러에 골프공, physics이나 이미지가 연결되지 않았습니다!");
             return;
         }
-
+        hitWriteText();
+        coefficientWriteText();
+    }
+    void coefficientWriteText()
+    {
+        cofficientText.text = $"Friction Coefficient : {golfPhysics.currentFriction:F2}\nRestitution Coefficient : {golfPhysics.currentRestitution:F2}";
+    }
+    void hitWriteText()
+    {
         // 비율 계산
         float powerRatio = golfPlayer.power / golfPlayer.maxPower;
 
