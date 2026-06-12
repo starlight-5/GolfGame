@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro; // ★ TextMeshPro를 사용하기 위해 반드시 추가해야 합니다!
-public class WindUIController : MonoBehaviour
+public class WindUiController : MonoBehaviour
 {
     [Header("References")]
     [Tooltip("바람 물리 엔진이 들어있는 스크립트를 연결해주세요")]
